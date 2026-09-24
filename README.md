@@ -34,9 +34,14 @@ Other scripts: `npm run build`, `npm run start`, `npm run lint`.
 ```
 src/
 ├── app/                  # App Router — layout, globals.css (design tokens), page
-├── components/           # Modular UI (TimerDisplay, TaskItem, SoundToggle, …)
-├── hooks/                # useStoreHydration and other shared hooks
+├── components/
+│   ├── dashboard/        # Dashboard shell, Header, TimerSection
+│   ├── sound/            # SoundPanel — the Sanctuary ambient mixer (UI)
+│   ├── tasks/            # TaskSection, TaskItem (dissolve ritual), TaskInput
+│   └── ui/               # Radix-backed primitives (Slider)
+├── hooks/                # useStoreHydration, useClientNow
 ├── lib/                  # Pure logic & types
+│   ├── motion.ts         #   Shared Framer Motion easing/variants
 │   ├── storage.ts        #   StorageAdapter — LocalStorage now, Supabase later
 │   ├── time.ts           #   Clock formatting & day-key helpers
 │   ├── timer-meta.ts     #   Timer mode labels/defaults/bounds
