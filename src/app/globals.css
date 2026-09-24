@@ -81,4 +81,22 @@
   *::-webkit-scrollbar-track {
     background: transparent;
   }
+
+  /* Stillness for those who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Touch devices have no hover — keep row actions discoverable */
+  @media (hover: none) {
+    .touch-actions {
+      opacity: 1 !important;
+    }
+  }
 }

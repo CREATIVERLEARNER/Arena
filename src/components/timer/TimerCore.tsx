@@ -60,7 +60,7 @@ export function TimerCore({ size = "default" }: TimerCoreProps) {
           <p
             className={cn(
               "mt-4 font-mono text-[10px] tracking-[0.35em] uppercase transition-colors duration-1000",
-              status === "finished" ? "text-mist" : "text-faint",
+              status === "finished" ? "animate-pulse text-mist" : "text-faint",
             )}
           >
             {statusLabel}

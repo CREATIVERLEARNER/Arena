@@ -163,7 +163,7 @@ export function TaskItem({ task, variant = "active" }: TaskItemProps) {
           </span>
         ) : (
           !editing && (
-            <span className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
+            <span className="touch-actions flex shrink-0 items-center gap-1 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
               <button
                 type="button"
                 onClick={() => {

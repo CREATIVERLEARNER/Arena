@@ -66,4 +66,23 @@ src/
 - [x] **Phase 2** — UI shell & task manager (dashboard layout, Void List with dissolve ritual)
 - [x] **Phase 3** — Focus timer (drift-free engine, progress ring, session flow, Zen Mode, shortcuts)
 - [x] **Phase 4** — Sanctuary soundboard (six voices synthesized live via Web Audio, mixable + persisted)
-- [ ] **Phase 5** — Polish & persistence (stats, animations, final pass)
+- [x] **Phase 5** — Polish & persistence (7-day focus chart, daily rollover, a11y & touch pass)
+
+## Features
+
+- **Focus Timer** — Pomodoro (25/5), Deep Work (custom 5–240 min), Stopwatch.
+  Drift-free wall-clock engine, draining violet progress ring, focus→break
+  session chaining, daily focus log.
+- **Zen Mode** — pure-black full-screen void with only the timer; breathing
+  glow while running. `Z` to enter, `Esc` to surface.
+- **Keyboard rituals** — `Space` begin/pause · `R` reset · `Z` zen · `Esc` exit.
+- **Void List** — add/edit/delete tasks; completing one draws a line through
+  it, blurs it into the void, and sinks it into a dim "dissolved" section.
+  New days sweep yesterday's dissolved tasks away.
+- **Sanctuary Soundboard** — six ambiences (Rain, Deep Space, White Noise,
+  Fire, Café, Forest Night) synthesized live via Web Audio — no files, no
+  network. Per-sound faders; the whole mix persists.
+- **Focus analytics** — today's total in the header and timer, plus a minimal
+  7-day bar chart scaled to your best day.
+- **Persistence** — tasks, timer preferences, focus log and the sound mix all
+  survive refreshes via a storage-adapter seam (LocalStorage now, cloud-ready).

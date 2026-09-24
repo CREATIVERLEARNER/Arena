@@ -4,10 +4,12 @@ import { useState } from "react";
 
 import { Header } from "@/components/dashboard/Header";
 import { SoundPanel } from "@/components/sound/SoundPanel";
+import { FocusChart } from "@/components/stats/FocusChart";
 import { TaskSection } from "@/components/tasks/TaskSection";
 import { TimerSection } from "@/components/timer/TimerSection";
 import { ZenOverlay } from "@/components/timer/ZenOverlay";
 import { useAudioBridge } from "@/hooks/useAudioBridge";
+import { useDailyRollover } from "@/hooks/useDailyRollover";
 import { useStoreHydrated } from "@/hooks/useStoreHydration";
 import { useTimerEngine } from "@/hooks/useTimerEngine";
 import { useTimerShortcuts } from "@/hooks/useTimerShortcuts";
@@ -16,9 +18,9 @@ import { useTaskStore } from "@/store/useTaskStore";
 import { useTimerStore } from "@/store/useTimerStore";
 
 /**
- * The Sanctuary — a single dark column holding the timer, the ambient mixer
- * and the Void List. Content fades in only after the stores have rehydrated,
- * so the first paint is always serene (no flashed defaults).
+ * The Sanctuary — a single dark column holding the timer, the ambient mixer,
+ * the Void List and the week's focus record. Content fades in only after the
+ * stores have rehydrated, so the first paint is always serene.
  */
 export function Dashboard() {
   const [soundOpen, setSoundOpen] = useState(false);
@@ -29,10 +31,12 @@ export function Dashboard() {
 
   const running = useTimerStore((s) => s.status === "running");
 
-  // the heartbeat, the keyboard rituals, and the soundboard bridge live at the root
+  // the heartbeat, the keyboard rituals, the soundboard bridge and the daily
+  // rollover all live at the root
   useTimerEngine();
   useTimerShortcuts();
   useAudioBridge();
+  useDailyRollover();
 
   return (
     <div className="relative flex min-h-dvh flex-col">
@@ -62,6 +66,7 @@ export function Dashboard() {
           <TimerSection />
           <SoundPanel open={soundOpen} />
           <TaskSection />
+          <FocusChart />
         </div>
       </main>
 
