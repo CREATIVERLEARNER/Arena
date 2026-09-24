@@ -1,62 +1,61 @@
 "use client";
 
-import { useState } from "react";
-import { CloudRain, Coffee, Flame, Sparkles, TreePine, Waves, type LucideIcon } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import { Slider } from "@/components/ui/Slider";
+import { audioEngine } from "@/lib/audio/engine";
 import { EASE_VOID } from "@/lib/motion";
+import { SOUNDS, SOUND_IDS, type SoundMeta } from "@/lib/sound-meta";
 import { cn } from "@/lib/utils";
-
-interface SoundDef {
-  id: string;
-  name: string;
-  icon: LucideIcon;
-}
-
-/** The sanctuary palette — six loops to mix. Audio engine arrives in Phase 4. */
-const SOUNDS: readonly SoundDef[] = [
-  { id: "rain", name: "Rain", icon: CloudRain },
-  { id: "deep-space", name: "Deep Space", icon: Sparkles },
-  { id: "white-noise", name: "White Noise", icon: Waves },
-  { id: "fire", name: "Crackling Fire", icon: Flame },
-  { id: "cafe", name: "Café", icon: Coffee },
-  { id: "forest", name: "Forest Night", icon: TreePine },
-] as const;
+import { useSoundStore } from "@/store/useSoundStore";
 
 interface SoundToggleProps {
-  name: string;
-  icon: LucideIcon;
+  meta: SoundMeta;
   volume: number;
+  active: boolean;
+  onToggle: () => void;
   onVolumeChange: (volume: number) => void;
 }
 
-/** One voice of the sanctuary: icon, name, and its own volume fader. */
-function SoundToggle({ name, icon: Icon, volume, onVolumeChange }: SoundToggleProps) {
-  const active = volume > 0;
+/** One voice of the sanctuary: a summoning sigil, its name, its own fader. */
+function SoundToggle({ meta, volume, active, onToggle, onVolumeChange }: SoundToggleProps) {
+  const Icon = meta.icon;
   return (
     <div className="flex items-center gap-3 border-b border-line/40 py-3 last:border-b-0">
-      <Icon
-        aria-hidden
+      <button
+        type="button"
+        onClick={() => {
+          audioEngine.unlock(); // the click itself is the gesture that resumes audio
+          onToggle();
+        }}
+        aria-pressed={active}
+        aria-label={`${active ? "Silence" : "Summon"} ${meta.name}`}
         className={cn(
-          "size-4 shrink-0 transition-colors duration-700",
-          active ? "text-glow/70" : "text-faint",
+          "grid size-8 shrink-0 place-items-center rounded-full border transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          active
+            ? "border-glow/40 bg-glow/10 text-glow/90 shadow-[0_0_16px_rgba(139,124,246,0.18)]"
+            : "border-line text-faint hover:border-ghost hover:text-mist",
         )}
-      />
+      >
+        <Icon className="size-3.5" aria-hidden />
+      </button>
+
       <span
         className={cn(
           "flex-1 truncate text-sm font-light transition-colors duration-700",
           active ? "text-mist" : "text-faint",
         )}
       >
-        {name}
+        {meta.name}
       </span>
+
       <Slider
         value={volume}
         onValueChange={onVolumeChange}
-        aria-label={`${name} volume`}
+        aria-label={`${meta.name} volume`}
         className="w-28 sm:w-32"
       />
+
       <span className="w-7 text-right font-mono text-[10px] text-ghost tabular-nums">
         {volume}
       </span>
@@ -69,16 +68,16 @@ interface SoundPanelProps {
 }
 
 /**
- * The Sanctuary soundboard — collapsible panel beneath the header.
- * Phase 4 wires these faders to real ambient loops; Phase 5 persists the mix.
+ * The Sanctuary soundboard — a collapsible mixing desk for six synthesized
+ * ambiences. The mix and which voices are sounding both persist across visits.
  */
 export function SoundPanel({ open }: SoundPanelProps) {
-  // presentational state until the audio engine lands
-  const [volumes, setVolumes] = useState<Record<string, number>>(() =>
-    Object.fromEntries(SOUNDS.map((sound) => [sound.id, 0])),
-  );
+  const volumes = useSoundStore((s) => s.volumes);
+  const active = useSoundStore((s) => s.active);
+  const setVolume = useSoundStore((s) => s.setVolume);
+  const toggle = useSoundStore((s) => s.toggle);
 
-  const playingCount = Object.values(volumes).filter((v) => v > 0).length;
+  const playingCount = SOUND_IDS.filter((id) => active[id]).length;
 
   return (
     <AnimatePresence initial={false}>
@@ -95,26 +94,25 @@ export function SoundPanel({ open }: SoundPanelProps) {
                 Sanctuary · ambient mixer
               </h2>
               <p className="font-mono text-[10px] tracking-[0.2em] text-ghost uppercase">
-                {playingCount > 0 ? `${playingCount} playing` : "silence"}
+                {playingCount > 0 ? `${playingCount} sounding` : "silence"}
               </p>
             </div>
 
             <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 sm:gap-x-10">
-              {SOUNDS.map((sound) => (
+              {SOUNDS.map((meta) => (
                 <SoundToggle
-                  key={sound.id}
-                  name={sound.name}
-                  icon={sound.icon}
-                  volume={volumes[sound.id] ?? 0}
-                  onVolumeChange={(volume) =>
-                    setVolumes((prev) => ({ ...prev, [sound.id]: volume }))
-                  }
+                  key={meta.id}
+                  meta={meta}
+                  volume={volumes[meta.id] ?? 0}
+                  active={active[meta.id] ?? false}
+                  onToggle={() => toggle(meta.id)}
+                  onVolumeChange={(volume) => setVolume(meta.id, volume)}
                 />
               ))}
             </div>
 
             <p className="mt-4 text-right font-mono text-[9px] tracking-[0.25em] text-ghost/70 uppercase">
-              audio loops arrive in phase 4
+              synthesized live · web audio · no files
             </p>
           </section>
         </motion.div>

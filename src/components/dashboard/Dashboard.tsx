@@ -7,6 +7,7 @@ import { SoundPanel } from "@/components/sound/SoundPanel";
 import { TaskSection } from "@/components/tasks/TaskSection";
 import { TimerSection } from "@/components/timer/TimerSection";
 import { ZenOverlay } from "@/components/timer/ZenOverlay";
+import { useAudioBridge } from "@/hooks/useAudioBridge";
 import { useStoreHydrated } from "@/hooks/useStoreHydration";
 import { useTimerEngine } from "@/hooks/useTimerEngine";
 import { useTimerShortcuts } from "@/hooks/useTimerShortcuts";
@@ -28,9 +29,10 @@ export function Dashboard() {
 
   const running = useTimerStore((s) => s.status === "running");
 
-  // the heartbeat and the keyboard rituals live at the root
+  // the heartbeat, the keyboard rituals, and the soundboard bridge live at the root
   useTimerEngine();
   useTimerShortcuts();
+  useAudioBridge();
 
   return (
     <div className="relative flex min-h-dvh flex-col">

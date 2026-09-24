@@ -65,5 +65,5 @@ src/
 - [x] **Phase 1** — Setup & architecture (scaffold, design tokens, Zustand stores)
 - [x] **Phase 2** — UI shell & task manager (dashboard layout, Void List with dissolve ritual)
 - [x] **Phase 3** — Focus timer (drift-free engine, progress ring, session flow, Zen Mode, shortcuts)
-- [ ] **Phase 4** — Sanctuary soundboard (ambient loops, per-sound volume mixer)
+- [x] **Phase 4** — Sanctuary soundboard (six voices synthesized live via Web Audio, mixable + persisted)
 - [ ] **Phase 5** — Polish & persistence (stats, animations, final pass)
