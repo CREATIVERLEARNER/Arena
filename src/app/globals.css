@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────
+   VOID · Design System
+   A sanctuary of pure black, silver type, and a single dim glow.
+   ───────────────────────────────────────────────────────────── */
+
+@theme {
+  /* Palette — "the void aesthetic" */
+  --color-pure: #000000;      /* pure black — Zen Mode background        */
+  --color-void: #09090b;      /* deep charcoal — app background (zinc-950) */
+  --color-surface: #0d0d10;   /* raised surface — cards, panels          */
+  --color-elevated: #18181b;  /* inputs, hover fills (zinc-900)          */
+  --color-line: #27272a;      /* hairline borders (zinc-800)             */
+  --color-ghost: #3f3f46;     /* disabled strokes (zinc-700)             */
+  --color-faint: #52525b;     /* tertiary text, resting icons (zinc-600) */
+  --color-mist: #a1a1aa;      /* secondary text (zinc-400)               */
+  --color-silver: #e4e4e7;    /* primary text (zinc-200)                 */
+  --color-glow: #8b7cf6;      /* dim violet — only when the timer runs   */
+
+  /* Typography — geometric sans for UI, mono for shifting digits */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+
+  /* Motion — slow, calming; nothing snaps */
+  --ease-void: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-fade-in: fade-in 0.8s var(--ease-void) both;
+  --animate-rise: rise 1s var(--ease-void) both;
+  --animate-breathe: breathe 7s ease-in-out infinite;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.85; }
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background: var(--color-void);
+    color: var(--color-silver);
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-glow) 28%, transparent);
+    color: var(--color-silver);
+  }
+
+  /* Accessible focus rings that belong to the dark theme */
+  :where(a, button, input, textarea, select, [role="button"], [role="slider"]):focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--color-glow) 60%, transparent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Whisper-quiet scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: var(--color-line);
+    border-radius: 9999px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
