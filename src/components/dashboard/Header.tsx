@@ -1,6 +1,6 @@
 "use client";
 
-import { Volume2 } from "lucide-react";
+import { Maximize2, Volume2 } from "lucide-react";
 
 import { useClientNow } from "@/hooks/useClientNow";
 import { useStoreHydrated } from "@/hooks/useStoreHydration";
@@ -18,6 +18,7 @@ export function Header({ soundOpen, onToggleSound }: HeaderProps) {
 
   const hydrated = useStoreHydrated(useTimerStore);
   const todayFocusSeconds = useTimerStore(selectTodayFocusSeconds);
+  const toggleZen = useTimerStore((s) => s.toggleZen);
 
   const dateLabel = now?.toLocaleDateString(undefined, {
     weekday: "long",
@@ -35,7 +36,7 @@ export function Header({ soundOpen, onToggleSound }: HeaderProps) {
         <div className="flex items-center gap-3 sm:gap-4">
           <p className="font-mono text-[10px] tracking-[0.2em] text-ghost uppercase sm:text-[11px]">
             {dateLabel && <span className="hidden sm:inline">{dateLabel}</span>}
-            <span className="hidden sm:inline text-line"> · </span>
+            <span className="hidden text-line sm:inline"> · </span>
             <span
               className={cn(
                 "transition-opacity duration-700",
@@ -45,6 +46,15 @@ export function Header({ soundOpen, onToggleSound }: HeaderProps) {
               {formatDuration(todayFocusSeconds)} today
             </span>
           </p>
+
+          <button
+            type="button"
+            onClick={toggleZen}
+            aria-label="Enter Zen Mode"
+            className="grid size-8 place-items-center rounded-full border border-line text-faint transition-all duration-500 hover:border-ghost hover:text-silver"
+          >
+            <Maximize2 className="size-3.5" aria-hidden />
+          </button>
 
           <button
             type="button"

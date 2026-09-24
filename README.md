@@ -63,7 +63,7 @@ src/
 ## Roadmap
 
 - [x] **Phase 1** — Setup & architecture (scaffold, design tokens, Zustand stores)
-- [ ] **Phase 2** — UI shell & task manager (dashboard layout, Void List)
-- [ ] **Phase 3** — Focus timer (drift-free engine, timer UI, Zen Mode)
+- [x] **Phase 2** — UI shell & task manager (dashboard layout, Void List with dissolve ritual)
+- [x] **Phase 3** — Focus timer (drift-free engine, progress ring, session flow, Zen Mode, shortcuts)
 - [ ] **Phase 4** — Sanctuary soundboard (ambient loops, per-sound volume mixer)
 - [ ] **Phase 5** — Polish & persistence (stats, animations, final pass)

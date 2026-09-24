@@ -3,10 +3,13 @@
 import { useState } from "react";
 
 import { Header } from "@/components/dashboard/Header";
-import { TimerSection } from "@/components/dashboard/TimerSection";
 import { SoundPanel } from "@/components/sound/SoundPanel";
 import { TaskSection } from "@/components/tasks/TaskSection";
+import { TimerSection } from "@/components/timer/TimerSection";
+import { ZenOverlay } from "@/components/timer/ZenOverlay";
 import { useStoreHydrated } from "@/hooks/useStoreHydration";
+import { useTimerEngine } from "@/hooks/useTimerEngine";
+import { useTimerShortcuts } from "@/hooks/useTimerShortcuts";
 import { cn } from "@/lib/utils";
 import { useTaskStore } from "@/store/useTaskStore";
 import { useTimerStore } from "@/store/useTimerStore";
@@ -23,15 +26,29 @@ export function Dashboard() {
   const timerHydrated = useStoreHydrated(useTimerStore);
   const hydrated = tasksHydrated && timerHydrated;
 
+  const running = useTimerStore((s) => s.status === "running");
+
+  // the heartbeat and the keyboard rituals live at the root
+  useTimerEngine();
+  useTimerShortcuts();
+
   return (
     <div className="relative flex min-h-dvh flex-col">
-      {/* permanent halo — the room the sanctuary sits in */}
+      {/* the room's halo — it breathes only while you focus */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(139,124,246,0.05)_0%,transparent_65%)]"
+        className={cn(
+          "pointer-events-none absolute left-1/2 top-0 h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-1000",
+          running
+            ? "animate-breathe bg-[radial-gradient(circle,rgba(139,124,246,0.09)_0%,transparent_65%)]"
+            : "bg-[radial-gradient(circle,rgba(139,124,246,0.05)_0%,transparent_65%)]",
+        )}
       />
 
-      <Header soundOpen={soundOpen} onToggleSound={() => setSoundOpen((open) => !open)} />
+      <Header
+        soundOpen={soundOpen}
+        onToggleSound={() => setSoundOpen((open) => !open)}
+      />
 
       <main className="mx-auto w-full max-w-2xl grow px-5 sm:px-8">
         <div
@@ -48,6 +65,8 @@ export function Dashboard() {
 
       {/* floor breathing room */}
       <div className="h-16" aria-hidden />
+
+      <ZenOverlay />
     </div>
   );
 }

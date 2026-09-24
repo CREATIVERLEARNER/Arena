@@ -213,3 +213,14 @@ export const selectIsTimerActive = (state: TimerState) =>
 
 export const selectTodayFocusSeconds = (state: TimerState) =>
   state.focusLog[todayKey()] ?? 0;
+
+/**
+ * Ring progress 0→1. Countdown drains the ring; the stopwatch becomes a
+ * seconds dial, refilling every minute.
+ */
+export const selectTimerProgress = (state: TimerState): number => {
+  if (state.mode === "stopwatch") return (state.elapsedSeconds % 60) / 60;
+  const total = sessionLength(state);
+  if (total <= 0) return 0;
+  return Math.min(1, Math.max(0, 1 - state.remainingSeconds / total));
+};
