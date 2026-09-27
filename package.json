@@ -1,0 +1,25 @@
+{
+  "name": "bookroom",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A cozy 2D bookroom for your comics — place bookcases, shelve your CBZs, arrange by hand or by metadata.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "npm run test:zip && npm run test:state && npm run test:render",
+    "test:zip": "node scripts/test-zip.mjs",
+    "test:state": "node scripts/test-state.mjs",
+    "test:render": "esbuild scripts/test-render.jsx --bundle --format=esm --jsx=automatic --platform=node --packages=external --outfile=node_modules/.test-render.mjs --log-level=warning && node node_modules/.test-render.mjs"
+  },
+  "dependencies": {
+    "@fontsource/fraunces": "^5.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
+  }
+}
