@@ -110,6 +110,31 @@ async function readComicInfo(zip) {
   }
 }
 
+/**
+ * Open a comic archive, recursing into a nested .cbz/.zip if the outer
+ * archive contains no images (some tools wrap CBZs in another zip).
+ * Throws a descriptive error when no pages can be found at all.
+ */
+export async function openComic(file, depth = 0) {
+  const zip = await openZip(file)
+  if (zip.pages.length) return zip
+
+  const nested = zip.entries.find(
+    (e) => /\.(cbz|zip)$/i.test(e.name) && !e.name.includes('__MACOSX') && !e.name.endsWith('/'),
+  )
+  if (nested && depth < 2) {
+    const inner = await zip.read(nested)
+    return openComic(inner, depth + 1)
+  }
+
+  // Nothing readable — help the user (and bug reports) see what's inside
+  const names = zip.entries
+    .filter((e) => !e.name.endsWith('/'))
+    .slice(0, 4)
+    .map((e) => e.name.split('/').pop() || e.name)
+  throw new Error('No images inside — contains ' + (names.join(', ') || 'nothing'))
+}
+
 // ── image helpers ─────────────────────────────────────────────────────────
 
 /** Downscale an image blob to ≤ maxW wide and re-encode as JPEG. */
@@ -187,8 +212,7 @@ export async function dominantColor(blob) {
  *   `book` has no id/order yet — caller assigns those.
  */
 export async function importCbz(file) {
-  const zip = await openZip(file)
-  if (!zip.pages.length) throw new Error('No images found inside')
+  const zip = await openComic(file)
   const info = (await readComicInfo(zip)) || {}
 
   const first = zip.pages[0]
