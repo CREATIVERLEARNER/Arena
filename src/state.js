@@ -347,6 +347,25 @@ export function moveBooks(state, ids, shelfId, spot = null) {
   }
 }
 
+/**
+ * Add a batch of brand-new books onto a shelf (or to Loose Books when
+ * shelfId is null). Books that don't fit on the shelf fall back to Loose
+ * instead of piling up in the overflow tray.
+ */
+export function importToShelf(state, newBooks, shelfId) {
+  let next = addBooks(state, newBooks)
+  if (!shelfId) return next
+  next = moveBooks(next, newBooks.map((b) => b.id), shelfId)
+  const shelf = next.shelves.find((s) => s.id === shelfId)
+  if (shelf) {
+    const { overflow } = layoutShelf(shelf, next.books)
+    const fresh = new Set(newBooks.map((b) => b.id))
+    const stray = overflow.flat().map((b) => b.id).filter((id) => fresh.has(id))
+    if (stray.length) next = moveBooks(next, stray, null)
+  }
+  return next
+}
+
 // ── misc selectors ────────────────────────────────────────────────────────
 
 export const booksOfShelf = (state, shelfId) =>

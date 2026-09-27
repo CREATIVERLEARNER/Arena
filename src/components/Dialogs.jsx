@@ -193,7 +193,7 @@ export function HelpDialog({ onClose }) {
           <h4>Importing</h4>
           <ul>
             <li><b>Drop .cbz / .zip files anywhere</b> — covers, titles, series and volume numbers are pulled automatically (from ComicInfo.xml when present, otherwise the filename).</li>
-            <li>Imported books land in <b>Loose books</b> — open it, tick books, and move them to any shelf in bulk.</li>
+            <li>Books go onto the <b>shelf you're looking at</b> when you drop them; from the room they go to <b>Loose books</b> — tick them there and move them to any shelf in bulk.</li>
             <li>Re-importing the same file is skipped automatically.</li>
             <li>.cbr (RAR) isn’t supported — convert to .cbz first.</li>
           </ul>
@@ -213,12 +213,10 @@ export function HelpDialog({ onClose }) {
 
 // ── import progress panel ─────────────────────────────────────────────────
 
-export function ImportOverlay({ data, onClose, onUndo }) {
+export function ImportOverlay({ data, onClose, onUndo, onShelve }) {
+  const { state } = useApp()
   const done = data.phase === 'done'
-  const counts = data.items.reduce(
-    (acc, it) => { acc[it.status] = (acc[it.status] || 0) + 1; return acc },
-    {},
-  )
+  const loose = done && data.summary?.destination === 'Loose Books' && data.summary.imported > 0
   return (
     <div className="import-panel">
       <div className="import-head">
@@ -249,17 +247,30 @@ export function ImportOverlay({ data, onClose, onUndo }) {
       {done && data.summary && (
         <div className="import-summary">
           <span>
-            <b>{data.summary.imported}</b> imported
+            <b>{data.summary.imported}</b> imported → <b>{data.summary.destination}</b>
+            {data.summary.strays ? <> · {data.summary.strays} to Loose (no room)</> : null}
             {data.summary.skipped ? <> · {data.summary.skipped} duplicate{data.summary.skipped > 1 ? 's' : ''} skipped</> : null}
             {data.summary.failed ? <> · <b className="err">{data.summary.failed} failed</b></> : null}
           </span>
           <span className="spacer" />
           {data.undo && (
-            <button className="btn btn-mini" onClick={() => onUndo(data.undo)}>Undo import</button>
+            <button className="btn btn-mini" onClick={() => onUndo(data.undo)}>Undo</button>
           )}
-          {data.summary.imported > 0 && (
-            <button className="btn btn-mini btn-primary" onClick={() => { onClose() }}>Done</button>
+          {loose && state.shelves.length > 0 && (
+            <select
+              defaultValue=""
+              onChange={(e) => {
+                const v = e.target.value
+                if (v) onShelve(v)
+              }}
+            >
+              <option value="" disabled>Move all to…</option>
+              {state.shelves.map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
           )}
+          <button className="btn btn-mini btn-primary" onClick={onClose}>Done</button>
         </div>
       )}
     </div>

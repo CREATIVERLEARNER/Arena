@@ -11,7 +11,7 @@ const STATUS = [
 ]
 
 export default function BookModal({ mode, bookId, targetShelfId, onClose }) {
-  const { state, actions, confirm, toast } = useApp()
+  const { state, setState, actions, confirm, toast } = useApp()
   const isNew = mode === 'new'
   const book = isNew ? null : state.books.find((b) => b.id === bookId)
 
@@ -19,6 +19,8 @@ export default function BookModal({ mode, bookId, targetShelfId, onClose }) {
     title: '', series: '', number: '', author: '', pages: '',
     status: 'unread', rating: 0, tags: '', notes: '', spineColor: null,
   }))
+  // where the new book goes — starts as whatever view opened the form
+  const [target, setTarget] = useState(targetShelfId ?? null)
   // tags are edited as a raw string, committed as an array on blur/enter
   const [tagsDraft, setTagsDraft] = useState(null)
   const [pendingCover, setPendingCover] = useState(null) // {blob, url} before creation
@@ -85,12 +87,20 @@ export default function BookModal({ mode, bookId, targetShelfId, onClose }) {
       spineImageId: null,
       addedAt: Date.now(),
     }
-    actions.setState?.((s) => moveBooksPure(addBooks(s, [meta]), [id], targetShelfId ?? null))
-    toast(targetShelfId ? 'Book added' : 'Book added to Loose Books')
+    // does it fit on the chosen shelf? if not, it goes to Loose Books
+    const shelfObj = target ? state.shelves.find((s) => s.id === target) : null
+    const fits = shelfObj ? findSpot(shelfObj, state.books, thicknessOf(meta)).fits : false
+    const dest = fits ? target : null
+    setState((s) => moveBooksPure(addBooks(s, [meta]), [id], dest))
+    toast(
+      dest
+        ? `Book added to “${shelfObj.name}”`
+        : shelfObj
+          ? 'Bookcase is full — added to Loose Books'
+          : 'Book added to Loose Books',
+    )
     onClose()
   }
-
-  const shelfNow = isNew ? targetShelfId ?? null : book.shelfId
 
   return (
     <Modal title={isNew ? 'Add a book' : (b.title || b.series || 'Book')} onClose={onClose} wide>
@@ -274,7 +284,14 @@ export default function BookModal({ mode, bookId, targetShelfId, onClose }) {
           <div className="bm-actions">
             {isNew ? (
               <>
-                <span className="muted">Will be added to: <b>{shelfOptions.find((o) => (o.id ?? null) === (targetShelfId ?? null))?.name}</b></span>
+                <label className="field bm-addto">
+                  <span>Add to</span>
+                  <select value={target ?? ''} onChange={(e) => setTarget(e.target.value || null)}>
+                    {shelfOptions.map((o) => (
+                      <option key={o.id ?? 'loose'} value={o.id ?? ''}>{o.name}</option>
+                    ))}
+                  </select>
+                </label>
                 <span className="spacer" />
                 <button className="btn" onClick={onClose}>Cancel</button>
                 <button className="btn btn-primary" onClick={saveNew}>Add book</button>

@@ -634,6 +634,7 @@ button { font-family: inherit; }
   display: flex; gap: 10px; align-items: center; margin-top: 8px;
   border-top: 1px solid var(--line); padding-top: 16px; flex-wrap: wrap;
 }
+.bm-addto { margin-bottom: 0; flex: 0 0 auto; min-width: 210px; }
 .spacer { flex: 1; }
 
 /* shelf settings + settings + help */

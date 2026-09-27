@@ -121,6 +121,7 @@ export default function ShelfView({ kind, shelfId }) {
   const isLoose = kind === 'loose'
 
   const bodyRef = useRef(null)
+  const impRef = useRef(null)
   const rowEls = useRef([])
   const caretEls = useRef([])
   const [scale, setScale] = useState(2.2)
@@ -389,6 +390,7 @@ export default function ShelfView({ kind, shelfId }) {
     openMenu(
       [
         { icon: '＋', label: 'Add a book…', onClick: () => actions.newBook(shelf.id) },
+        { icon: '⇩', label: 'Import comics to this shelf…', onClick: () => impRef.current?.click() },
         { icon: '⚙', label: 'Bookcase options…', onClick: () => actions.openShelfSettings(shelf.id) },
         '-',
         { icon: '▤', label: 'Back to the room', onClick: () => actions.openRoom() },
@@ -698,6 +700,18 @@ export default function ShelfView({ kind, shelfId }) {
       {tip && <Tooltip tip={tip} />}
 
       {moving && <MoveDialog ids={moving} onClose={() => setMoving(null)} />}
+
+      <input
+        ref={impRef}
+        type="file"
+        multiple
+        accept=".cbz,.zip"
+        hidden
+        onChange={(e) => {
+          if (!isLoose && shelf) actions.importFiles(e.target.files, shelf.id)
+          e.target.value = ''
+        }}
+      />
     </div>
   )
 }

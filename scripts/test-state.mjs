@@ -5,7 +5,7 @@ import assert from 'node:assert'
 import {
   defaultState, addShelf, addBooks, updateShelf, deleteShelf, updateBook,
   moveBooks, materializeLayout, layoutShelf, rowInnerW, findSpot, thicknessOf,
-  SORTS, bookcaseHeight, TOP, ROW_H, BOARD,
+  importToShelf, SORTS, bookcaseHeight, TOP, ROW_H, BOARD,
 } from '../src/state.js'
 
 const B = (id, series, number, extra = {}) => ({

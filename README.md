@@ -22,8 +22,9 @@ fast on purpose. Built as a companion to [Komga](https://komga.org): keep readin
   (series, number, writer…), otherwise it parses the filename (`Berserk v05.cbz`,
   `Vinland Saga Chapter 12.cbz`, `Yotsuba&! v03 [Group].cbz` …). Duplicates are skipped on re-import,
   and an accidental import can be undone.
-- **Loose books** — imports land in a to-shelve inbox; tick books and move them onto any shelf in
-  bulk.
+- **Loose books** — imports made from the room land in a to-shelve inbox (the import panel offers a
+  one-click "move all to…"); drop files while a shelf is open and they shelve directly onto it.
+  Tick books and move them in bulk any time.
 - **Read tracking** — unread/reading/read status, 5-star ratings, tags and notes. Unread books get a
   little dot on the spine, 4★+ books get a gold pip.
 - **Backup** — everything lives in your browser (IndexedDB); export/import a JSON backup to move it.

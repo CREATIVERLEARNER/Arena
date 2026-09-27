@@ -5,8 +5,9 @@ import { uid, download } from './lib/util.js'
 import { shrinkImage } from './lib/importer.js'
 import { collectFiles, isCbzFile, importCbz } from './lib/importer.js'
 import {
-  defaultState, addShelf, updateShelf, deleteShelf, updateBook, addBooks,
+  defaultState, addShelf, updateShelf, deleteShelf, updateBook,
   deleteBooks, moveBooks as moveBooksPure, materializeLayout, blobIdsOf,
+  importToShelf,
 } from './state.js'
 import { withSampleLibrary } from './lib/sample.js'
 import RoomView from './components/RoomView.jsx'
@@ -216,13 +217,18 @@ export default function App() {
     },
 
     // ── CBZ import ──
-    importFiles: async (fileList) => {
+    // With no explicit target, books go onto the shelf you're currently
+    // looking at (if any), otherwise to Loose Books.
+    importFiles: async (fileList, targetShelfId = null) => {
       const all = Array.from(fileList || [])
       const files = all.filter(isCbzFile)
       if (!files.length) {
         toast('No .cbz / .zip files found — drop your comic archives to import them')
         return
       }
+      const target = targetShelfId ?? (viewRef.current?.kind === 'shelf' ? viewRef.current.id : null)
+      const targetShelf = target ? stateRef.current?.shelves.find((s) => s.id === target) : null
+      const destination = targetShelf?.name || 'Loose Books'
       const items = files.map((f) => ({ id: uid('im-'), name: f.name, status: 'pending', detail: '' }))
       setImporting({ phase: 'running', items, summary: null })
       const setItem = (i, patch) =>
@@ -274,9 +280,22 @@ export default function App() {
           addedAt: Date.now(),
         })
       }
-      if (newBooks.length) setState((s) => addBooks(s, newBooks))
+      let strays = 0
+      if (newBooks.length) {
+        // place onto the target shelf; whatever doesn't fit falls back to Loose
+        setState((s) => importToShelf(s, newBooks, targetShelf ? target : null))
+        const preview = importToShelf(stateRef.current, newBooks, targetShelf ? target : null)
+        strays = newBooks.filter((b) => !preview.books.find((x) => x.id === b.id)?.shelfId).length
+      }
 
-      const summary = { imported: newBooks.length, skipped, failed, others: all.length - files.length }
+      const summary = {
+        imported: newBooks.length,
+        strays,
+        destination,
+        skipped,
+        failed,
+        others: all.length - files.length,
+      }
       const undo = newBooks.length
         ? {
             ids: newBooks.map((b) => b.id),
@@ -284,6 +303,13 @@ export default function App() {
           }
         : null
       setImporting((cur) => (cur ? { ...cur, phase: 'done', summary, undo } : cur))
+      if (newBooks.length) {
+        toast(
+          destination === 'Loose Books'
+            ? `Imported ${newBooks.length} → Loose Books`
+            : `Imported ${newBooks.length} → “${destination}”${strays ? ` · ${strays} to Loose (no room)` : ''}`,
+        )
+      }
     },
   }), [toast])
 
@@ -359,6 +385,12 @@ export default function App() {
         <ImportOverlay
           data={importing}
           onClose={() => setImporting(null)}
+          onShelve={(shelfId) => {
+            if (!importing.undo) return
+            actions.moveBooks(importing.undo.ids, shelfId)
+            setImporting(null)
+            toast(`Moved to “${state.shelves.find((s) => s.id === shelfId)?.name || 'shelf'}”`)
+          }}
           onUndo={async (undo) => {
             undo.coverIds.forEach((id) => db.delBlob(id).catch(() => {}))
             setState((s) => deleteBooks(s, undo.ids))
