@@ -2,7 +2,7 @@ import React, { useMemo, useRef, useState } from 'react'
 import { useApp } from '../context.js'
 import { Modal, Stars, CoverArt, useBlobUrl } from './ui.jsx'
 import { SPINE_PALETTE, spineColorOf, uid, fmtDate } from '../lib/util.js'
-import { moveBooks as moveBooksPure, addBooks } from '../state.js'
+import { moveBooks as moveBooksPure, addBooks, findSpot, thicknessOf } from '../state.js'
 
 const STATUS = [
   ['unread', 'Unread'],

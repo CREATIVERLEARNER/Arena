@@ -11,6 +11,8 @@ const read = (f) => readFileSync(new URL('../src/' + f, import.meta.url), 'utf8'
 const checks = [
   ['components/BookModal.jsx', 'setState((s) => moveBooksPure(addBooks(s, [meta]), [id], dest))', 'Add-book commits to state'],
   ['components/BookModal.jsx', 'value={target ?? \'\'}', 'Add-book shelf picker bound'],
+  ['components/BookModal.jsx', "import { moveBooks as moveBooksPure, addBooks, findSpot, thicknessOf } from '../state.js'", 'Add-book imports exist'],
+  ['App.jsx', 'const viewRef = useRef(view)', 'App tracks the current view for context-aware import'],
   ['App.jsx', 'importToShelf(s, newBooks, targetShelf ? target : null)', 'import places books onto shelves'],
   ['App.jsx', 'onShelve={(shelfId)', 'import panel shelve action wired'],
   ['App.jsx', "setState((s) => importToShelf(s, newBooks, targetShelf ? target : null))", 'importFiles commits via functional setState'],

@@ -52,6 +52,8 @@ export default function App() {
 
   const stateRef = useRef(null)
   useEffect(() => { stateRef.current = state }, [state])
+  const viewRef = useRef(view)
+  viewRef.current = view
 
   // ── boot ────────────────────────────────────────────────────────────────
   useEffect(() => {
